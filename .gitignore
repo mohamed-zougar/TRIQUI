@@ -1,0 +1,129 @@
+# ============================================================
+# PROJECT STRUCTURE - TRIFRONT (Next.js) & TRIBACK (Node.js)
+# ============================================================
+
+# ============================================================
+# DEPENDENCIES & PACKAGES
+# ============================================================
+node_modules/
+**/node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnpm-debug.log
+
+# ============================================================
+# ENVIRONMENT VARIABLES (DO NOT COMMIT SECRETS)
+# ============================================================
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ============================================================
+# FRONTEND BUILD ARTIFACTS (Next.js)
+# ============================================================
+TRIFRONT/.next/
+TRIFRONT/out/
+TRIFRONT/.vercel/
+TRIFRONT/dist/
+TRIFRONT/build/
+
+# ============================================================
+# BACKEND BUILD ARTIFACTS & RUNTIME
+# ============================================================
+TRIBACK/dist/
+TRIBACK/build/
+TRIBACK/.tsc-out/
+
+# ============================================================
+# LOGS & DEBUG
+# ============================================================
+logs/
+*.log
+npm-debug.log*
+npm-error.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================================
+# TESTING & COVERAGE
+# ============================================================
+coverage/
+.nyc_output/
+.jest-cache/
+.mocha_output/
+
+# ============================================================
+# IDE & EDITOR CONFIG (LOCAL SETUP, NOT TRACKED)
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.IntelliJIdea*/
+*.iml
+
+# ============================================================
+# TEMPORARY & CACHE FILES
+# ============================================================
+.cache/
+.next-cache/
+.turbo/
+.eslintcache
+temp/
+tmp/
+*.tsbuildinfo
+
+# ============================================================
+# DATABASE & LOCAL STORAGE
+# ============================================================
+*.db
+*.sqlite
+*.sqlite3
+data/
+local/
+
+# ============================================================
+# OPERATING SYSTEM FILES
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# ============================================================
+# BACKUP & TEMPORARY FILES
+# ============================================================
+*.bak
+*.backup
+*.swp
+*.tmp
+
+# ============================================================
+# UPLOADS & USER-GENERATED CONTENT
+# ============================================================
+uploads/
+static/uploads/
+public/uploads/
+
+# ============================================================
+# GIT INTERNALS
+# ============================================================
+.git/
+.gitkeep
