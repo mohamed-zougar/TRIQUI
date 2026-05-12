@@ -18,6 +18,7 @@ import {
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Dialog } from "@/components/ui/Dialog";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { ApiError, adminApi, postsApi, type UserProfile, type ClientPost, type ShipperPost } from "@/lib/api";
 import { useRequireAuth } from "@/lib/auth";
@@ -44,6 +45,11 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleteLoading, setDeleteLoading] = useState<string | number | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; userId: string | number | null }>({
+    open: false,
+    userId: null,
+  });
+  const [deleteMessage, setDeleteMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -73,15 +79,35 @@ export default function AdminPage() {
   }, [isReady, isAdmin, loadData]);
 
   const handleDeleteUser = async (userId: string | number) => {
-    if (!window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
-    
+    setDeleteDialog({ open: true, userId });
+  };
+
+  const confirmDeleteUser = async () => {
+    const userId = deleteDialog.userId;
+    if (!userId) return;
+
     setDeleteLoading(userId);
+    setDeleteMessage(null);
     try {
       await adminApi.deleteUser(userId);
-      setUsers(prev => prev.filter(u => u.id !== userId));
-      setStats(prev => prev ? { ...prev, totalUsers: prev.totalUsers - 1 } : null);
+      setUsers((prev) => prev.filter((u) => u.id !== userId));
+      setStats((prev) =>
+        prev ? { ...prev, totalUsers: prev.totalUsers - 1 } : null
+      );
+      setDeleteDialog({ open: false, userId: null });
+      setDeleteMessage({
+        type: "success",
+        text: "User deleted successfully.",
+      });
+      setTimeout(() => setDeleteMessage(null), 3000);
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : "Failed to delete user.");
+      setDeleteMessage({
+        type: "error",
+        text:
+          err instanceof ApiError
+            ? err.message
+            : "Failed to delete user. Please try again.",
+      });
     } finally {
       setDeleteLoading(null);
     }
@@ -372,6 +398,52 @@ export default function AdminPage() {
                ))}
              </div>
           </div>
+
+          {/* Delete Confirmation Dialog */}
+          <Dialog
+            open={deleteDialog.open}
+            onOpenChange={(open) =>
+              setDeleteDialog({ open, userId: open ? deleteDialog.userId : null })
+            }
+            title="Delete User"
+            description="This action cannot be undone. The user and all their data will be permanently removed."
+            footer={
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setDeleteDialog({ open: false, userId: null })}
+                  disabled={deleteLoading === deleteDialog.userId}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={confirmDeleteUser}
+                  isLoading={deleteLoading === deleteDialog.userId}
+                >
+                  Delete User
+                </Button>
+              </>
+            }
+          >
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Are you sure you want to delete this user? All posts, messages, and associated data will be permanently deleted.
+              </p>
+            </div>
+          </Dialog>
+
+          {/* Success/Error Message */}
+          {deleteMessage && (
+            <div className="fixed bottom-6 right-6 z-50">
+              <Alert
+                tone={deleteMessage.type === "success" ? "success" : "error"}
+                className="shadow-lg"
+              >
+                {deleteMessage.text}
+              </Alert>
+            </div>
+          )}
         </div>
       </div>
     </AppShell>

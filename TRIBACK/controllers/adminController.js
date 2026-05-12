@@ -76,7 +76,7 @@ exports.deleteUser = async (req, res, next) => {
     const { id } = req.params;
     
     // Prevent admin from deleting themselves
-    if (req.user.id.toString() === id.toString()) {
+    if (req.user.userId.toString() === id.toString()) {
       return res.status(400).json({ message: "You cannot delete your own admin account." });
     }
 
