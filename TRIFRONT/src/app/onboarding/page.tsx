@@ -106,7 +106,19 @@ function OnboardingContent() {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSkipOnboarding = async () => {
+    if (!token) return;
+    setError("");
+    setIsSubmitting(true);
+    try {
+      await authApi.skipOnboarding(token);
+      window.sessionStorage.removeItem("triqi_onboarding_token");
+      router.replace("/client");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Unable to skip onboarding.");
+      setIsSubmitting(false);
+    }
+  };
     event.preventDefault();
     if (!token) return;
     setError("");
@@ -261,10 +273,8 @@ function OnboardingContent() {
             variant="outline"
             fullWidth
             size="lg"
-            onClick={() => {
-              window.sessionStorage.removeItem("triqi_onboarding_token");
-              router.replace("/client");
-            }}
+            onClick={handleSkipOnboarding}
+            isLoading={isSubmitting}
           >
             Skip
           </Button>

@@ -645,6 +645,59 @@ async function updateProfile(req, res, next) {
   }
 }
 
+async function skipOnboarding(req, res, next) {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: "Onboarding token is required." });
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, env.jwtSecret);
+    } catch (_error) {
+      return res.status(401).json({ message: "Invalid or expired onboarding token." });
+    }
+    if (decoded.purpose !== "complete-profile") {
+      return res.status(401).json({ message: "Invalid onboarding token." });
+    }
+
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    if (!user.email_verified) {
+      return res.status(403).json({ message: "Verify your email before continuing." });
+    }
+
+    // Mark onboarding as complete with minimal/default values
+    const updatedUser = await User.completeOnboarding(user.id, {
+      image: user.image || null,
+      operating_city: user.operating_city || "Not specified",
+      delivery_focus: user.delivery_focus || "Not specified",
+      vehicle_type: user.account_type === "individual" ? (user.vehicle_type || null) : null,
+      vehicle_image: user.account_type === "individual" ? (user.vehicle_image || null) : null,
+      company_size: user.account_type === "enterprise" ? (user.company_size || null) : null,
+      average_daily_orders: user.account_type === "enterprise" ? (user.average_daily_orders || null) : null,
+      notifications_enabled: user.notifications_enabled ?? true,
+    });
+
+    const authToken = signToken(
+      { userId: updatedUser.id, role: updatedUser.role, accountType: updatedUser.account_type },
+      SESSION_TTL
+    );
+
+    return res.status(200).json({
+      message: "Onboarding skipped.",
+      token: authToken,
+      user: authSummary(updatedUser),
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   register,
   login,
@@ -654,6 +707,7 @@ module.exports = {
   sendEmailVerification,
   verifyEmail,
   completeProfile,
+  skipOnboarding,
   getProfile,
   updateProfile,
 };

@@ -12,6 +12,7 @@ const {
   sendEmailVerification,
   verifyEmail,
   completeProfile,
+  skipOnboarding,
   getProfile,
   updateProfile,
 } = require("../controllers/authController");
@@ -32,6 +33,7 @@ router.post("/verify-otp", otpLimiter, verifyResetOtp);
 router.post("/reset-password", authLimiter, resetPassword);
 
 router.post("/complete-profile", authLimiter, completeProfile);
+router.post("/skip-onboarding", authLimiter, skipOnboarding);
 
 router.get("/profile", authMiddleware, getProfile);
 router.put("/profile", authMiddleware, updateProfile);

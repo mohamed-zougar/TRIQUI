@@ -259,6 +259,15 @@ export const authApi = {
     return data;
   },
 
+  async skipOnboarding(token: string) {
+    const data = await request<{ token: string; user: AuthSummary; message: string }>(
+      "/auth/skip-onboarding",
+      { method: "POST", body: JSON.stringify({ token }) }
+    );
+    persistSession(data.token, data.user);
+    return data;
+  },
+
   async getProfile() {
     return request<{ user: UserProfile }>("/auth/profile", { method: "GET" }, true);
   },
